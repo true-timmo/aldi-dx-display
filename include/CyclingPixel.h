@@ -35,6 +35,10 @@ class CyclingPixel final
 
         CRGB getPixel()
         {
+            if (random(0, 9) == 5) {
+                this->getHue();
+            }
+
             return this->pixel.setHue(this->getHue());
         };
 };

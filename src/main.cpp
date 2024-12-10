@@ -24,10 +24,10 @@ void setup()
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    cyclingPixels[0] = CyclingPixel(0, 30);
+    cyclingPixels[0] = CyclingPixel(0, 32);
     cyclingPixels[1] = CyclingPixel(160,175);
-    cyclingPixels[2] = CyclingPixel(30, 55);
-    cyclingPixels[3] = CyclingPixel(31, 60);
+    cyclingPixels[2] = CyclingPixel(16, 55);
+    cyclingPixels[3] = CyclingPixel(16, 55);
 }
 
 void loop()
@@ -37,7 +37,7 @@ void loop()
     leds[2] = cyclingPixels[2].getPixel();
     leds[3] = cyclingPixels[3].getPixel();
 
-    delay(100);
+    delay(50);
 
     FastLED.show();
 }
