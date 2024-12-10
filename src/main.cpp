@@ -8,13 +8,9 @@
 #define NUM_LEDS    4
 #define BRIGHTNESS  255
 
-CRGB red = CRGB(240, 42, 0);
-CRGB clinic = CRGB(212, 81, 4);
-CRGB orange = CRGB(240, 212, 0);
-CRGB yellow = CRGB(255, 255, 0);
-CRGB blue = CRGB(80, 0 ,250);
-
 CRGB leds[NUM_LEDS];
+uint8_t currentHue[NUM_LEDS];
+bool increaseHue[NUM_LEDS];
 
 void setup()
 {
@@ -28,13 +24,39 @@ void setup()
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    leds[0] = red;
-    leds[1] = blue;
-    leds[2] = clinic;
-    leds[3] = yellow;
+    leds[0] = CRGB(255,0,0);
+    leds[1] = CRGB(255,0,0);
+    leds[2] = CRGB(255,0,0);
+    leds[3] = CRGB(255,0,0);
+
+    currentHue[0] = 6;
+    currentHue[1] = 12;
+    currentHue[2] = 24;
+    currentHue[3] = 48;
+
+    increaseHue[0] = true;
+    increaseHue[1] = false;
+    increaseHue[2] = true;
+    increaseHue[3] = false;
+}
+
+uint8_t cycleHue(uint8_t index)
+{
+    if (currentHue[index] == 0 || currentHue[index] == 64) {
+        increaseHue[index] = !increaseHue[index];
+    }
+
+    return increaseHue[index] ? currentHue[index]++ : currentHue[index]--;
 }
 
 void loop()
 {
+    leds[0].setHue(cycleHue(0));
+    leds[1].setHue(cycleHue(1));
+    leds[2].setHue(cycleHue(2));
+    leds[3].setHue(cycleHue(3));
+
+    delay(200);
+
     FastLED.show();
 }
