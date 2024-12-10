@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "FastLED.h"
+#include "CyclingPixel.h"
 
 #define CLK_PIN     GPIO_NUM_16
 #define SI_PIN      GPIO_NUM_17
@@ -9,8 +10,7 @@
 #define BRIGHTNESS  255
 
 CRGB leds[NUM_LEDS];
-uint8_t currentHue[NUM_LEDS];
-bool increaseHue[NUM_LEDS];
+CyclingPixel cyclingPixels[NUM_LEDS];
 
 void setup()
 {
@@ -24,39 +24,20 @@ void setup()
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    leds[0] = CRGB(255,0,0);
-    leds[1] = CRGB(255,0,0);
-    leds[2] = CRGB(255,0,0);
-    leds[3] = CRGB(255,0,0);
-
-    currentHue[0] = 6;
-    currentHue[1] = 12;
-    currentHue[2] = 24;
-    currentHue[3] = 48;
-
-    increaseHue[0] = true;
-    increaseHue[1] = false;
-    increaseHue[2] = true;
-    increaseHue[3] = false;
-}
-
-uint8_t cycleHue(uint8_t index)
-{
-    if (currentHue[index] == 0 || currentHue[index] == 64) {
-        increaseHue[index] = !increaseHue[index];
-    }
-
-    return increaseHue[index] ? currentHue[index]++ : currentHue[index]--;
+    cyclingPixels[0] = CyclingPixel(0, 30);
+    cyclingPixels[1] = CyclingPixel(160,175);
+    cyclingPixels[2] = CyclingPixel(30, 55);
+    cyclingPixels[3] = CyclingPixel(31, 60);
 }
 
 void loop()
 {
-    leds[0].setHue(cycleHue(0));
-    leds[1].setHue(cycleHue(1));
-    leds[2].setHue(cycleHue(2));
-    leds[3].setHue(cycleHue(3));
+    leds[0] = cyclingPixels[0].getPixel();
+    leds[1] = cyclingPixels[1].getPixel();
+    leds[2] = cyclingPixels[2].getPixel();
+    leds[3] = cyclingPixels[3].getPixel();
 
-    delay(200);
+    delay(100);
 
     FastLED.show();
 }
