@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "FastLED.h"
-#include "CyclingPixel.h"
+#include "ColorCycle.h"
+#include "ColorBlend.h"
 
 #define CLK_PIN     GPIO_NUM_16
 #define SI_PIN      GPIO_NUM_17
@@ -10,7 +11,11 @@
 #define BRIGHTNESS  255
 
 CRGB leds[NUM_LEDS];
-CyclingPixel cyclingPixels[NUM_LEDS];
+ColorCycle cyclingPixels[NUM_LEDS];
+ColorBlend blendingPixel = ColorBlend(60, 5000);
+
+bool isBlue = false;
+unsigned long turnedBlue = 0;
 
 void setup()
 {
@@ -24,18 +29,22 @@ void setup()
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    cyclingPixels[0] = CyclingPixel(0, 32);
-    cyclingPixels[1] = CyclingPixel(160,175);
-    cyclingPixels[2] = CyclingPixel(16, 55);
-    cyclingPixels[3] = CyclingPixel(16, 55);
+    cyclingPixels[0] = ColorCycle(0, 40);
+    cyclingPixels[1] = ColorCycle(0, 40);
+    leds[3] = CRGB(CRGB::WhiteSmoke);
+    leds[3].maximizeBrightness();
+
 }
 
 void loop()
 {
-    leds[0] = cyclingPixels[0].getPixel();
-    leds[1] = cyclingPixels[1].getPixel();
-    leds[2] = cyclingPixels[2].getPixel();
-    leds[3] = cyclingPixels[3].getPixel();
+    leds[0] = cyclingPixels[0].cycle();
+    leds[1] = cyclingPixels[1].cycle();
+    leds[2] = blendingPixel.blend(CRGB(16,18,158), CRGB(255, 255, 255));
+
+    if (blendingPixel.isDone()) {
+        blendingPixel.reverse();
+    }
 
     delay(50);
 
