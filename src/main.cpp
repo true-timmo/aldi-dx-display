@@ -2,6 +2,7 @@
 #include "FastLED.h"
 #include "ColorCycle.h"
 #include "ColorBlend.h"
+#include "MultiColorBlend.h"
 
 #define CLK_PIN     GPIO_NUM_16
 #define SI_PIN      GPIO_NUM_17
@@ -11,11 +12,19 @@
 #define BRIGHTNESS  255
 
 CRGB leds[NUM_LEDS];
-ColorCycle cyclingPixels[NUM_LEDS];
-ColorBlend blendingPixel = ColorBlend(60, 5000);
+MultiColorBlend multiPixel[NUM_LEDS];
 
 bool isBlue = false;
 unsigned long turnedBlue = 0;
+
+std::vector<CRGB> availableColors = {
+    CRGB(250,205,73),
+    CRGB(213,41,15),
+    CRGB(55,25,80),
+    CRGB(242,130,11),
+    CRGB(138,39,58),
+    CRGB(255,255,255),
+};
 
 void setup()
 {
@@ -24,27 +33,23 @@ void setup()
     while(!Serial);
 
     FastLED.addLeds<LED_TYPE, SI_PIN, CLK_PIN, COLOR_ORDER>(leds, NUM_LEDS)
-        .setCorrection(TypicalLEDStrip)
+        .setCorrection(UncorrectedColor)
         .setDither(BRIGHTNESS < 255);
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    cyclingPixels[0] = ColorCycle(0, 40);
-    cyclingPixels[1] = ColorCycle(0, 40);
-    leds[3] = CRGB(CRGB::WhiteSmoke);
-    leds[3].maximizeBrightness();
-
+    multiPixel[0] = MultiColorBlend(60, 1000);
+    multiPixel[1] = MultiColorBlend(60, 500);
+    multiPixel[2] = MultiColorBlend(60, 800);
+    multiPixel[3] = MultiColorBlend(60, 1200);
 }
 
 void loop()
 {
-    leds[0] = cyclingPixels[0].cycle();
-    leds[1] = cyclingPixels[1].cycle();
-    leds[2] = blendingPixel.blend(CRGB(16,18,158), CRGB(255, 255, 255));
-
-    if (blendingPixel.isDone()) {
-        blendingPixel.reverse();
-    }
+    leds[0] = multiPixel[0].blend(availableColors);
+    leds[1] = multiPixel[1].blend(availableColors);
+    leds[2] = multiPixel[2].blend(availableColors);
+    leds[3] = multiPixel[3].blend(availableColors);
 
     delay(50);
 
